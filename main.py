@@ -41,7 +41,7 @@ def handleTickets(doc: str) -> None:
 
     for ticket in tickets:
         if (get_child_element_data_by_tag_name(ticket, 'spam') == 'true'):
-            break
+            continue
 
         ticket_dict = {}
 
