@@ -23,6 +23,7 @@ def start() -> None:
             if (filename_pattern.match(filename)):
                 file_path = os.path.join(dir, filename)
                 handleTickets(parse(file_path))
+                print(f'Parsed {filename}')
 
 
 def handleTickets(doc: str) -> None:
@@ -80,7 +81,8 @@ def get_child_element_data_by_tag_name(parent_element: Node, tag_name: str) -> s
 
     if (elements_len != 1):
         if (elements_len == 0):
-            print(f'Error: no content in {tag_name} in parent {parent_element.tagName}')
+            pass
+            # print(f'Error: no content in {tag_name} in parent {parent_element.tagName}')
         else:
           print(f'Error: too much child elements {tag_name} in parent {parent_element.tagName} : {elements_len} elements')
 
