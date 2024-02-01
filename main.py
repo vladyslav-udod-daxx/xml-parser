@@ -71,6 +71,9 @@ def handleTickets(doc: str) -> None:
                     )
                 )
 
+                if (check_if_formatted_answer_is_useless(answer_dict['text'])):
+                    continue
+
                 ticket_dict['answers'].append(answer_dict)
 
         # ticket without answers is useless
@@ -93,6 +96,8 @@ def check_if_ticket_is_useless(ticket_element: Node) -> bool:
     description = get_child_element_data_by_tag_name(ticket_element, 'description')
     if (
         description.startswith('This is an automated ticket') or
+        description.startswith('Abandoned call from') or
+        description.startswith('Voicemail from') or
         check_if_sting_contain_only_links(description)
     ):
         return True
@@ -111,12 +116,31 @@ def check_if_note_is_useless(note_element: Node) -> bool:
     if (source == '4' or source == '15'):
         return True
 
-    answer_text = get_child_element_data_by_tag_name(note_element, 'body')
+    answer_text = get_child_element_data_by_tag_name(note_element, 'body').lower()
     if (
         answer_text == '' or
-        answer_text.startswith('Jira issue status changed to') or
-        answer_text.startswith('Conversation between') or
-        check_if_sting_contain_only_links(answer_text)
+        answer_text.startswith('jira issue status changed to') or
+        answer_text.startswith('conversation between') or
+        answer_text.startswith('Voicemail from') or
+        check_if_sting_contain_only_links(answer_text) or
+        'dit ticket is gesloten en samengevoegd met ticket' in answer_text or
+        'is samengevoegd in dit ticket.' in answer_text or
+        'tested on staging' in answer_text or
+        'tested on release branch' in answer_text or
+        'tested on prod' in answer_text or
+        'tested on production' in answer_text
+    ):
+        return True
+
+    return False
+
+re_useless_anwser = re.compile(r'^ticket #[0-9]+$', re.I)
+
+def check_if_formatted_answer_is_useless(answer: str) -> bool:
+    global re_useless_anwser
+    if (
+        re_useless_anwser.match(answer) or
+        answer.startswith('Call ticket')
     ):
         return True
 
